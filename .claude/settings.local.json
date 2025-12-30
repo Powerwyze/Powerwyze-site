@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "Bash(where:*)",
+      "Bash(npm run dev:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(taskkill:*)",
+      "Bash(mkdir:*)",
+      "Bash(supabase db:*)",
+      "Bash(echo $env:ELEVENLABS_API_KEY)",
+      "Bash(Get-ChildItem Env:ELEVENLABS_API_KEY)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
