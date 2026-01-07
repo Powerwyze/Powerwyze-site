@@ -46,6 +46,7 @@ export function ElevenLabsConversation({ agentId, onError, onStatusChange }: Con
       
       const conversation = await Conversation.startSession({
         agentId: agentId,
+        connectionType: 'websocket',
         onConnect: () => {
           console.log('✓ ElevenLabs SDK: Connected!')
           setStatus('connected')

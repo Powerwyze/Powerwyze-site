@@ -3,12 +3,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Flip } from 'gsap/Flip'
 import Lenis from 'lenis'
 import Link from 'next/link'
 import Image from 'next/image'
 
-gsap.registerPlugin(ScrollTrigger, Flip)
+gsap.registerPlugin(ScrollTrigger)
 
 export default function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -301,7 +300,7 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[var(--light-bg)] text-[var(--text-primary)] overflow-x-hidden">
+    <div className="min-h-screen bg-[#05060B] text-white overflow-x-hidden">
       {/* Fixed Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass backdrop-blur-lg bg-white/70 border-b border-white/30">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -461,16 +460,19 @@ export default function LandingPage() {
       <section
         className="py-32 px-4"
         style={{
-          background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d299c2 100%)'
+          background: 'radial-gradient(circle at 15% 20%, rgba(0,245,255,0.10), transparent 35%), radial-gradient(circle at 80% 10%, rgba(138,43,226,0.12), transparent 40%), linear-gradient(135deg, #0a0c14 0%, #0b0f1f 55%, #0a0c14 100%)'
         }}
       >
         {/* Overlay */}
-        <div className="absolute inset-0 bg-white/30" />
+        <div className="absolute inset-0 bg-[url('/assets/backgrounds/neural-grid.png')] opacity-20 mix-blend-screen" />
 
         <div className="max-w-7xl mx-auto relative z-10">
-          <h2 className="text-5xl font-bold text-center mb-20">
-            Choose Your <span className="gradient-text drop-shadow-lg">Voice Tier</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-6">
+            Choose Your <span className="gradient-text drop-shadow-lg">Agent Tier</span>
           </h2>
+          <p className="text-center text-white/70 max-w-2xl mx-auto mb-16">
+            Start simple, go multilingual, or unlock advanced workflows across email, SMS, and social.
+          </p>
 
           <div className="grid md:grid-cols-3 gap-8">
             {tiers.map((tier, i) => (
@@ -478,7 +480,7 @@ export default function LandingPage() {
                 key={i}
                 onMouseEnter={() => setActiveTier(i)}
                 onMouseLeave={() => setActiveTier(null)}
-                className={`relative glass-card cursor-pointer transition-all duration-500 bg-white/95 ${
+                className={`relative glass-card cursor-pointer transition-all duration-500 bg-white/5 border border-white/10 ${
                   activeTier === null || activeTier === i
                     ? 'opacity-100 scale-100'
                     : 'opacity-30 scale-95'
@@ -514,14 +516,14 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-bold mb-2 text-center">{tier.name}</h3>
+                <h3 className="text-2xl font-bold mb-2 text-center text-white">{tier.name}</h3>
                 <div className={`text-4xl font-bold mb-6 text-center bg-gradient-to-r ${tier.color} bg-clip-text text-transparent`}>
                   {tier.price}
                 </div>
 
                 <ul className="space-y-3">
                   {tier.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-[var(--text-secondary)]">
+                    <li key={idx} className="flex items-center gap-2 text-white/75">
                       <svg className="w-5 h-5 text-[var(--electric-cyan)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -530,7 +532,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
 
-                <button className="w-full mt-6 btn-glass py-3 rounded-xl font-semibold">
+                <button className="w-full mt-6 py-3 rounded-xl font-semibold border border-white/20 bg-white/10 text-white hover:border-[var(--electric-cyan)]/50 hover:shadow-[0_0_25px_rgba(0,245,255,0.25)] transition-all">
                   Get Started
                 </button>
               </div>
@@ -633,17 +635,17 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-12 px-4 bg-white">
+      <footer className="border-t border-white/10 py-12 px-4 bg-[#05060B]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-2xl font-bold gradient-text">Voicify It</div>
-          <div className="text-gray-500 text-sm">
+          <div className="text-white/60 text-sm">
             (c) 2024 Voicify It. All rights reserved.
           </div>
           <div className="flex gap-6">
-            <Link href="/auth/signin" className="text-[var(--text-secondary)] hover:text-[var(--electric-cyan)] transition-colors">
+            <Link href="/auth/signin" className="text-white/70 hover:text-[var(--electric-cyan)] transition-colors">
               Sign In
             </Link>
-            <Link href="/exhibits" className="text-[var(--text-secondary)] hover:text-[var(--electric-cyan)] transition-colors">
+            <Link href="/exhibits" className="text-white/70 hover:text-[var(--electric-cyan)] transition-colors">
               Dashboard
             </Link>
           </div>

@@ -696,6 +696,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
                         name: agent.name,
                         systemPrompt: agent.persona,
                         personality: agent.persona,
+                        voice: agent.voice || '21m00Tcm4TlvDq8ikWAM',
                         firstMessage: `Hello! I'm ${agent.name}. How can I help you today?`
                       }}
                       tier={agent.tier || 1}
