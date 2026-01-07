@@ -2,12 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import Link from 'next/link'
 import Image from 'next/image'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export default function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -18,8 +15,17 @@ export default function LandingPage() {
   const qrRef = useRef<HTMLDivElement>(null)
   const [activeTier, setActiveTier] = useState<number | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isGsapReady, setIsGsapReady] = useState(false)
 
   useEffect(() => {
+    let isCancelled = false
+
+    ;(async () => {
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+      if (!isCancelled) setIsGsapReady(true)
+    })()
+
     // Initialize Lenis smooth scroll
     const lenis = new Lenis({
       duration: 1.2,
@@ -38,12 +44,13 @@ export default function LandingPage() {
     setTimeout(() => setIsLoaded(true), 100)
 
     return () => {
+      isCancelled = true
       lenis.destroy()
     }
   }, [])
 
   useEffect(() => {
-    if (!isLoaded) return
+    if (!isLoaded || !isGsapReady) return
 
     // Hero Entrance Animation - Character by character reveal
     if (headlineRef.current) {
@@ -114,10 +121,10 @@ export default function LandingPage() {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
     }
-  }, [isLoaded])
+  }, [isLoaded, isGsapReady])
 
   useEffect(() => {
-    if (!isLoaded) return
+    if (!isLoaded || !isGsapReady) return
 
     // Small delay to ensure DOM is ready
     setTimeout(() => {
@@ -231,15 +238,15 @@ export default function LandingPage() {
       }
 
       // Refresh ScrollTrigger after setup
-      ScrollTrigger.refresh()
+      ;(gsap as any).ScrollTrigger?.refresh?.()
     }, 500)
-  }, [isLoaded])
+  }, [isLoaded, isGsapReady])
 
   // Voice waveform data
   const waveformPath = "M0,50 Q10,30 20,50 T40,50 T60,50 T80,50 T100,50 T120,50 T140,50 T160,50 T180,50 T200,50"
 
   useEffect(() => {
-    if (!isLoaded) return
+    if (!isLoaded || !isGsapReady) return
 
     // Animate voice waveform
     const waveform = document.querySelector('.voice-wave')
@@ -254,20 +261,20 @@ export default function LandingPage() {
         ease: 'power1.inOut'
       })
     }
-  }, [isLoaded])
+  }, [isLoaded, isGsapReady])
 
   const tiers = [
     {
       name: 'Essential Voice',
       icon: 'I',
-      price: '/mo',
+      price: '$99/mo',
       features: ['Single language', '1,000 conversations/mo', 'Smart prompts', 'QR codes + landing'],
       color: 'from-blue-400 to-blue-600'
     },
     {
       name: 'Multi-Language Pro',
       icon: 'II',
-      price: '/mo',
+      price: '$299/mo',
       features: ['50+ languages', '5,000 conversations/mo', 'Advanced analytics', 'Custom branding'],
       color: 'from-[var(--electric-cyan)] to-[var(--royal-violet)]',
       popular: true
@@ -458,7 +465,7 @@ export default function LandingPage() {
 
       {/* Section 3: Agent Tier Bento Grid - Purple/pink gradient */}
       <section
-        className="py-32 px-4"
+        className="relative py-32 px-4"
         style={{
           background: 'radial-gradient(circle at 15% 20%, rgba(0,245,255,0.10), transparent 35%), radial-gradient(circle at 80% 10%, rgba(138,43,226,0.12), transparent 40%), linear-gradient(135deg, #0a0c14 0%, #0b0f1f 55%, #0a0c14 100%)'
         }}
