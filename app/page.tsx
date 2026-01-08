@@ -171,8 +171,7 @@ export default function LandingPage() {
         const chatViewport = phoneRef.current.querySelector('.ml-chat-viewport')
         const chatList = phoneRef.current.querySelector('.ml-chat-list')
         const chatBubbles = phoneRef.current.querySelectorAll('.ml-chat-bubble')
-        const wavePaths = phoneRef.current.querySelectorAll('.ml-wave-path')
-        const waveDash = phoneRef.current.querySelector('.ml-wave-dash')
+        const spectrumBars = phoneRef.current.querySelectorAll('.ml-spectrum-bar')
 
         gsap.from(copy, {
           opacity: 0,
@@ -203,26 +202,28 @@ export default function LandingPage() {
           )
         }
 
-        if (wavePaths.length) {
-          const waveD1 = 'M0,20 C14,8 28,32 42,20 C56,8 70,32 84,20 C98,8 112,32 126,20 C140,8 154,32 168,20 C182,8 196,32 210,20'
-          const waveD2 = 'M0,20 C14,12 28,28 42,20 C56,4 70,36 84,20 C98,10 112,30 126,20 C140,6 154,34 168,20 C182,14 196,26 210,20'
-          const waveD3 = 'M0,20 C14,6 28,34 42,20 C56,14 70,26 84,20 C98,2 112,38 126,20 C140,10 154,30 168,20 C182,4 196,36 210,20'
+        if (spectrumBars.length) {
+          gsap.set(spectrumBars, { transformOrigin: '50% 100%', scaleY: 0.35 })
 
-          const waveTween = gsap.to(wavePaths, {
+          const spectrumTween = gsap.to(spectrumBars, {
             keyframes: [
-              { attr: { d: waveD2 }, duration: 0.5 },
-              { attr: { d: waveD3 }, duration: 0.5 },
-              { attr: { d: waveD1 }, duration: 0.5 },
+              { scaleY: () => 0.25 + Math.random() * 0.85, duration: 0.18 },
+              { scaleY: () => 0.25 + Math.random() * 0.85, duration: 0.18 },
+              { scaleY: () => 0.25 + Math.random() * 0.85, duration: 0.18 },
             ],
+            stagger: { each: 0.02, from: 'random' },
             repeat: -1,
+            yoyo: true,
             ease: 'sine.inOut',
           })
-          cleanupFns.push(() => waveTween.kill())
-        }
 
-        if (waveDash) {
-          const dashTween = gsap.to(waveDash, { attr: { strokeDashoffset: -220 }, duration: 1.6, repeat: -1, ease: 'none' })
-          cleanupFns.push(() => dashTween.kill())
+          const ring = phoneRef.current.querySelector('.ml-spectrum-ring')
+          const ringSpin = ring ? gsap.to(ring, { rotate: 360, duration: 18, repeat: -1, ease: 'none' }) : null
+
+          cleanupFns.push(() => {
+            spectrumTween.kill()
+            ringSpin?.kill()
+          })
         }
 
         if (mock && chatViewport && chatList && chatBubbles.length) {
@@ -643,44 +644,38 @@ export default function LandingPage() {
                     <div className="text-[11px] tracking-[0.25em] uppercase text-white/50 mb-2">Visitor Experience</div>
                     <div className="text-xl font-black text-white leading-tight">Mona Lisa</div>
 
-                    <div className="mt-3 flex items-center justify-center">
-                      <svg width="220" height="40" viewBox="0 0 220 40" className="opacity-95">
-                        <defs>
-                          <linearGradient id="mlWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="var(--electric-cyan)" />
-                            <stop offset="100%" stopColor="var(--royal-violet)" />
-                          </linearGradient>
-                        </defs>
-                        <path
-                          className="ml-wave-path ml-wave-dash"
-                          d="M0,20 C14,8 28,32 42,20 C56,8 70,32 84,20 C98,8 112,32 126,20 C140,8 154,32 168,20 C182,8 196,32 210,20"
-                          fill="none"
-                          stroke="url(#mlWaveGrad)"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeDasharray="10 12"
-                          strokeDashoffset="0"
-                          style={{ filter: 'drop-shadow(0 0 10px rgba(0,245,255,0.35))' }}
-                        />
-                        <path
-                          className="ml-wave-path"
-                          d="M0,20 C14,8 28,32 42,20 C56,8 70,32 84,20 C98,8 112,32 126,20 C140,8 154,32 168,20 C182,8 196,32 210,20"
-                          fill="none"
-                          stroke="url(#mlWaveGrad)"
-                          strokeWidth="8"
-                          strokeLinecap="round"
-                          opacity="0.12"
-                        />
-                        <path
-                          className="ml-wave-path"
-                          d="M0,20 C14,8 28,32 42,20 C56,8 70,32 84,20 C98,8 112,32 126,20 C140,8 154,32 168,20 C182,8 196,32 210,20"
-                          fill="none"
-                          stroke="url(#mlWaveGrad)"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          opacity="0.45"
-                        />
-                      </svg>
+                    <div className="mt-4 flex items-center justify-center">
+                      <div className="relative w-[108px] h-[108px]">
+                        <div className="ml-spectrum-ring absolute inset-0 rounded-full">
+                          {[...Array(48)].map((_, i) => (
+                            <span
+                              key={i}
+                              className="ml-spectrum-bar absolute left-1/2 top-1/2 w-[2px] h-5 rounded-full"
+                              style={{
+                                transform: `translate(-50%, -50%) rotate(${i * (360 / 48)}deg) translateY(-50px)`,
+                                background: i % 3 === 0 ? 'var(--electric-cyan)' : 'var(--royal-violet)',
+                                opacity: 0.85,
+                                filter: 'drop-shadow(0 0 10px rgba(0,245,255,0.25))',
+                              }}
+                            />
+                          ))}
+                        </div>
+
+                        <div className="absolute inset-[10px] rounded-full bg-gradient-to-br from-white/10 to-black/30 border border-white/10 overflow-hidden">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(0,245,255,0.20),transparent_55%)]" />
+                          <div className="relative w-full h-full">
+                            <Image
+                              src="/assets/exhibits/mona-lisa.jpg"
+                              alt="Mona Lisa"
+                              fill
+                              sizes="120px"
+                              className="object-cover opacity-95"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 50px rgba(0,245,255,0.15)' }} />
+                      </div>
                     </div>
                   </div>
                 </div>
