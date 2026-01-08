@@ -334,17 +334,17 @@ export default function LandingPage() {
     {
       title: 'Scan',
       desc: 'Visitors tap a glowing QR and launch the agent in seconds.',
-      image: '/assets/exhibits/museum-scan.jpg'
+      image: '/assets/exhibits/museum-scan.png'
     },
     {
       title: 'Pay',
       desc: 'Optional Stripe paywall unlocks premium stories and tours.',
-      image: '/assets/exhibits/paywall.jpg'
+      image: '/assets/exhibits/paywall.png'
     },
     {
       title: 'Talk',
       desc: 'Real-time voice chat tailored to the exhibit and venue brand.',
-      image: '/assets/exhibits/live-call.jpg'
+      image: '/assets/exhibits/live-call.png'
     }
   ]
 
