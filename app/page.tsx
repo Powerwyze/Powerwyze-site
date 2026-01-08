@@ -665,7 +665,7 @@ export default function LandingPage() {
                           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(0,245,255,0.20),transparent_55%)]" />
                           <div className="relative w-full h-full">
                             <Image
-                              src="/assets/exhibits/mona-lisa.jpg"
+                              src="/assets/exhibits/mona-lisa.png"
                               alt="Mona Lisa"
                               fill
                               sizes="120px"
