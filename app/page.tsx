@@ -194,13 +194,14 @@ export default function LandingPage() {
       }
 
       // Landing preview animation
-      if (phoneRef.current) {
-        const copy = phoneRef.current.querySelectorAll('.landing-copy > *')
-        const mock = phoneRef.current.querySelector('.landing-mock')
-        const chatViewport = phoneRef.current.querySelector('.ml-chat-viewport')
-        const chatList = phoneRef.current.querySelector('.ml-chat-list')
-        const chatBubbles = phoneRef.current.querySelectorAll('.ml-chat-bubble')
-        const spectrumBars = phoneRef.current.querySelectorAll('.ml-spectrum-bar')
+        if (phoneRef.current) {
+          const copy = phoneRef.current.querySelectorAll('.landing-copy > *')
+          const mock = phoneRef.current.querySelector('.landing-mock')
+          const chatViewport = phoneRef.current.querySelector('.ml-chat-viewport')
+          const chatList = phoneRef.current.querySelector('.ml-chat-list')
+          const chatBubbles = phoneRef.current.querySelectorAll('.ml-chat-bubble')
+          const spectrumBars = phoneRef.current.querySelectorAll('.ml-spectrum-bar')
+          const screenShot = phoneRef.current.querySelector('.ml-screen-shot')
 
         gsap.from(copy, {
           opacity: 0,
@@ -222,6 +223,24 @@ export default function LandingPage() {
               y: 0,
               scale: 1,
               duration: 1,
+              ease: 'power4.out',
+              scrollTrigger: {
+                trigger: phoneRef.current,
+                start: 'top 70%',
+              }
+            }
+          )
+        }
+
+        if (screenShot) {
+          gsap.fromTo(
+            screenShot,
+            { opacity: 0, scale: 1.06, filter: 'blur(10px)' },
+            {
+              opacity: 1,
+              scale: 1,
+              filter: 'blur(0px)',
+              duration: 1.1,
               ease: 'power4.out',
               scrollTrigger: {
                 trigger: phoneRef.current,
@@ -375,22 +394,6 @@ export default function LandingPage() {
       desc: 'Real-time voice chat tailored to the exhibit and venue brand.',
       image: '/assets/exhibits/live-call-mona.png'
     }
-  ]
-
-  const monaLisaChat = [
-    { side: 'ai' as const, text: 'Welcome. Stand a little closer — the softer the edge, the louder the feeling.' },
-    { side: 'user' as const, text: 'Why is your smile so mysterious?' },
-    { side: 'ai' as const, text: 'Because Leonardo painted me with sfumato — soft edges that let emotions shift as you look.' },
-    { side: 'user' as const, text: 'Were you meant to be happy?' },
-    { side: 'ai' as const, text: 'I am meant to be human. A smile that holds both warmth and distance.' },
-    { side: 'user' as const, text: 'What makes this painting feel alive?' },
-    { side: 'ai' as const, text: 'The gaze. The light. The unfinished certainty — your mind completes the story.' },
-    { side: 'user' as const, text: 'Is it true you have no eyebrows?' },
-    { side: 'ai' as const, text: 'Some say they faded, others say Leonardo left them out. Mystery is part of my job.' },
-    { side: 'user' as const, text: 'What should I notice next?' },
-    { side: 'ai' as const, text: 'Look at the landscape behind me — it is a world that doesn’t quite belong to ours.' },
-    { side: 'user' as const, text: 'What would you ask me?' },
-    { side: 'ai' as const, text: 'What do you feel first: calm, curiosity, or unease? That answer is also my portrait.' },
   ]
 
   return (
@@ -718,90 +721,15 @@ export default function LandingPage() {
                  style={{ boxShadow: '0 25px 80px rgba(0,0,0,0.35)' }}>
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-black/20" />
               <div className="relative aspect-[3/5] rounded-2xl overflow-hidden bg-[#05060B] border border-white/10">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-
-                <div className="relative z-10 px-5 pt-6 pb-4 border-b border-white/10 bg-black/10 backdrop-blur">
-                  <div className="text-center">
-                    <div className="text-[11px] tracking-[0.25em] uppercase text-white/50 mb-2">Visitor Experience</div>
-                    <div className="text-xl font-black text-white leading-tight">Mona Lisa</div>
-
-                    <div className="mt-4 flex items-center justify-center">
-                      <div className="relative w-[108px] h-[108px]">
-                        <div className="ml-spectrum-ring absolute inset-0 rounded-full">
-                          {[...Array(48)].map((_, i) => (
-                            <span
-                              key={i}
-                              className="ml-spectrum-bar absolute left-1/2 top-1/2 w-[2px] h-5 rounded-full"
-                              style={{
-                                transform: `translate(-50%, -50%) rotate(${i * (360 / 48)}deg) translateY(-50px)`,
-                                background: i % 3 === 0 ? 'var(--electric-cyan)' : 'var(--royal-violet)',
-                                opacity: 0.85,
-                                filter: 'drop-shadow(0 0 10px rgba(0,245,255,0.25))',
-                              }}
-                            />
-                          ))}
-                        </div>
-
-                        <div className="absolute inset-[10px] rounded-full bg-gradient-to-br from-white/10 to-black/30 border border-white/10 overflow-hidden">
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(0,245,255,0.20),transparent_55%)]" />
-                          <div className="relative w-full h-full">
-                            <Image
-                              src="/assets/exhibits/mona-lisa.png"
-                              alt="Mona Lisa"
-                              fill
-                              sizes="120px"
-                              className="object-cover opacity-95"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="absolute inset-0 rounded-full pointer-events-none" style={{ boxShadow: '0 0 50px rgba(0,245,255,0.15)' }} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="ml-chat-viewport relative z-10 px-5 py-5 h-[calc(100%-150px)] overflow-hidden">
-                  <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#05060B] to-transparent pointer-events-none" />
-                  <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#05060B] to-transparent pointer-events-none" />
-
-                  <div className="ml-chat-list space-y-3 will-change-transform">
-                    {monaLisaChat.map((m, i) => (
-                      <div
-                        key={i}
-                        className={['ml-chat-bubble flex items-end gap-2', m.side === 'ai' ? 'justify-start' : 'justify-end'].join(' ')}
-                        style={{ willChange: 'transform, opacity' }}
-                      >
-                        {m.side === 'ai' && (
-                          <div className="shrink-0 w-8 h-8 rounded-full bg-white/5 border border-white/10 grid place-items-center text-[10px] font-black text-white/70">
-                            ML
-                          </div>
-                        )}
-                        <div
-                          className={[
-                            'max-w-[85%] rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-sm',
-                            m.side === 'ai'
-                              ? 'bg-white/10 text-white rounded-bl-sm border border-white/10'
-                              : 'bg-gradient-to-r from-[var(--electric-cyan)] to-[var(--royal-violet)] text-black rounded-br-sm',
-                          ].join(' ')}
-                        >
-                          {m.text}
-                        </div>
-                        {m.side === 'user' && (
-                          <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[var(--electric-cyan)] to-[var(--royal-violet)] grid place-items-center text-[10px] font-black text-black">
-                            You
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-6 pt-4 bg-gradient-to-t from-[#05060B] to-transparent">
-                  <div className="w-full py-4 rounded-2xl bg-white text-black font-black text-center text-sm shadow-[0_0_30px_rgba(255,255,255,0.08)]">
-                    Talk with Agent
-                  </div>
-                </div>
+                <Image
+                  src="/assets/exhibits/live-call-mona.png"
+                  alt="Visitor experience preview"
+                  fill
+                  sizes="(max-width: 768px) 90vw, 420px"
+                  className="ml-screen-shot object-cover"
+                  priority={false}
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/30 pointer-events-none" />
               </div>
               <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-gradient-to-br from-[var(--electric-cyan)]/30 to-[var(--royal-violet)]/20 rounded-full blur-2xl" />
             </div>
