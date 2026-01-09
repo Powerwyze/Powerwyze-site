@@ -197,8 +197,8 @@ export default function LandingPage() {
         if (phoneRef.current) {
           const copy = phoneRef.current.querySelectorAll('.landing-copy > *')
           const mock = phoneRef.current.querySelector('.landing-mock')
-          const phoneWavePaths = phoneRef.current.querySelectorAll('.ml-phone-wave-path')
-          const phoneWaveDash = phoneRef.current.querySelector('.ml-phone-wave-dash')
+        const phoneWavePaths = phoneRef.current.querySelectorAll('.ml-acoustic-path')
+        const phoneWaveDash = phoneRef.current.querySelector('.ml-acoustic-dash')
           const screenShot = phoneRef.current.querySelector('.ml-screen-shot')
 
         gsap.from(copy, {
@@ -249,15 +249,17 @@ export default function LandingPage() {
         }
 
         if (phoneWavePaths.length) {
-          const d1 = 'M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48'
-          const d2 = 'M0,48 C22,36 44,60 66,48 C88,20 110,76 132,48 C154,34 176,62 198,48 C220,18 242,78 264,48 C286,38 308,58 330,48'
-          const d3 = 'M0,48 C22,18 44,78 66,48 C88,40 110,56 132,48 C154,22 176,74 198,48 C220,34 242,62 264,48 C286,16 308,80 330,48'
+          const d1 = 'M0,48 C18,48 30,34 42,48 C54,62 66,48 78,48 C90,48 102,30 114,48 C126,66 138,48 150,48 C162,48 174,36 186,48 C198,60 210,48 222,48 C234,48 246,32 258,48 C270,64 282,48 294,48 C306,48 318,38 330,48'
+          const d2 = 'M0,48 C18,44 30,26 42,48 C54,70 66,48 78,48 C90,48 102,22 114,48 C126,74 138,48 150,48 C162,48 174,28 186,48 C198,68 210,48 222,48 C234,48 246,20 258,48 C270,76 282,48 294,48 C306,48 318,30 330,48'
+          const d3 = 'M0,48 C18,52 30,42 42,48 C54,54 66,48 78,48 C90,48 102,40 114,48 C126,56 138,48 150,48 C162,48 174,44 186,48 C198,52 210,48 222,48 C234,48 246,38 258,48 C270,58 282,48 294,48 C306,48 318,46 330,48'
+          const d4 = 'M0,48 C18,40 30,18 42,48 C54,78 66,48 78,48 C90,48 102,14 114,48 C126,82 138,48 150,48 C162,48 174,22 186,48 C198,74 210,48 222,48 C234,48 246,16 258,48 C270,80 282,48 294,48 C306,48 318,26 330,48'
 
           const waveTween = gsap.to(phoneWavePaths, {
             keyframes: [
-              { attr: { d: d2 }, duration: 0.4 },
-              { attr: { d: d3 }, duration: 0.4 },
-              { attr: { d: d1 }, duration: 0.4 },
+              { attr: { d: d2 }, duration: 0.36 },
+              { attr: { d: d4 }, duration: 0.36 },
+              { attr: { d: d3 }, duration: 0.32 },
+              { attr: { d: d1 }, duration: 0.36 },
             ],
             repeat: -1,
             yoyo: true,
@@ -267,7 +269,7 @@ export default function LandingPage() {
         }
 
         if (phoneWaveDash) {
-          const dashTween = gsap.to(phoneWaveDash, { attr: { strokeDashoffset: -600 }, duration: 1.4, repeat: -1, ease: 'none' })
+          const dashTween = gsap.to(phoneWaveDash, { attr: { strokeDashoffset: -720 }, duration: 1.2, repeat: -1, ease: 'none' })
           cleanupFns.push(() => dashTween.kill())
         }
       }
@@ -700,6 +702,13 @@ export default function LandingPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/30 pointer-events-none" />
 
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 w-[86%] pointer-events-none">
+                  <div className="rounded-2xl bg-black/35 border border-white/10 backdrop-blur-md px-4 py-3 text-center shadow-[0_0_40px_rgba(0,245,255,0.14)]">
+                    <div className="text-[10px] uppercase tracking-[0.34em] text-white/65">Joe&apos;s History Museum</div>
+                    <div className="mt-1 text-lg font-black tracking-tight text-white">Mona Lisa</div>
+                  </div>
+                </div>
+
                 <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[78%] pointer-events-none">
                   <div className="ml-phone-wave relative rounded-2xl bg-black/35 border border-white/10 backdrop-blur-md px-4 py-4 shadow-[0_0_40px_rgba(0,245,255,0.18)]">
                     <svg viewBox="0 0 330 96" className="w-full h-12 opacity-95">
@@ -709,27 +718,28 @@ export default function LandingPage() {
                           <stop offset="100%" stopColor="var(--royal-violet)" />
                         </linearGradient>
                       </defs>
+
                       <path
-                        className="ml-phone-wave-path"
-                        d="M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48"
+                        className="ml-acoustic-path"
+                        d="M0,48 C18,48 30,34 42,48 C54,62 66,48 78,48 C90,48 102,30 114,48 C126,66 138,48 150,48 C162,48 174,36 186,48 C198,60 210,48 222,48 C234,48 246,32 258,48 C270,64 282,48 294,48 C306,48 318,38 330,48"
                         fill="none"
                         stroke="url(#mlPhoneWaveGrad)"
-                        strokeWidth="10"
+                        strokeWidth="12"
                         strokeLinecap="round"
-                        opacity="0.14"
+                        opacity="0.10"
                       />
                       <path
-                        className="ml-phone-wave-path"
-                        d="M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48"
+                        className="ml-acoustic-path"
+                        d="M0,48 C18,48 30,34 42,48 C54,62 66,48 78,48 C90,48 102,30 114,48 C126,66 138,48 150,48 C162,48 174,36 186,48 C198,60 210,48 222,48 C234,48 246,32 258,48 C270,64 282,48 294,48 C306,48 318,38 330,48"
                         fill="none"
                         stroke="url(#mlPhoneWaveGrad)"
                         strokeWidth="4"
                         strokeLinecap="round"
-                        style={{ filter: 'drop-shadow(0 0 10px rgba(0,245,255,0.35))' }}
+                        style={{ filter: 'drop-shadow(0 0 12px rgba(0,245,255,0.35))' }}
                       />
                       <path
-                        className="ml-phone-wave-path ml-phone-wave-dash"
-                        d="M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48"
+                        className="ml-acoustic-path ml-acoustic-dash"
+                        d="M0,48 C18,48 30,34 42,48 C54,62 66,48 78,48 C90,48 102,30 114,48 C126,66 138,48 150,48 C162,48 174,36 186,48 C198,60 210,48 222,48 C234,48 246,32 258,48 C270,64 282,48 294,48 C306,48 318,38 330,48"
                         fill="none"
                         stroke="url(#mlPhoneWaveGrad)"
                         strokeWidth="3"
@@ -740,7 +750,7 @@ export default function LandingPage() {
                       />
                     </svg>
                     <div className="mt-2 text-[10px] uppercase tracking-[0.28em] text-white/60 text-center">
-                      Live audio
+                      Acoustic audio
                     </div>
                   </div>
                 </div>
