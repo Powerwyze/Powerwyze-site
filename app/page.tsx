@@ -197,10 +197,8 @@ export default function LandingPage() {
         if (phoneRef.current) {
           const copy = phoneRef.current.querySelectorAll('.landing-copy > *')
           const mock = phoneRef.current.querySelector('.landing-mock')
-          const chatViewport = phoneRef.current.querySelector('.ml-chat-viewport')
-          const chatList = phoneRef.current.querySelector('.ml-chat-list')
-          const chatBubbles = phoneRef.current.querySelectorAll('.ml-chat-bubble')
-          const spectrumBars = phoneRef.current.querySelectorAll('.ml-spectrum-bar')
+          const phoneWavePaths = phoneRef.current.querySelectorAll('.ml-phone-wave-path')
+          const phoneWaveDash = phoneRef.current.querySelector('.ml-phone-wave-dash')
           const screenShot = phoneRef.current.querySelector('.ml-screen-shot')
 
         gsap.from(copy, {
@@ -250,56 +248,27 @@ export default function LandingPage() {
           )
         }
 
-        if (spectrumBars.length) {
-          gsap.set(spectrumBars, { transformOrigin: '50% 100%', scaleY: 0.35 })
+        if (phoneWavePaths.length) {
+          const d1 = 'M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48'
+          const d2 = 'M0,48 C22,36 44,60 66,48 C88,20 110,76 132,48 C154,34 176,62 198,48 C220,18 242,78 264,48 C286,38 308,58 330,48'
+          const d3 = 'M0,48 C22,18 44,78 66,48 C88,40 110,56 132,48 C154,22 176,74 198,48 C220,34 242,62 264,48 C286,16 308,80 330,48'
 
-          const spectrumTween = gsap.to(spectrumBars, {
+          const waveTween = gsap.to(phoneWavePaths, {
             keyframes: [
-              { scaleY: () => 0.25 + Math.random() * 0.85, duration: 0.18 },
-              { scaleY: () => 0.25 + Math.random() * 0.85, duration: 0.18 },
-              { scaleY: () => 0.25 + Math.random() * 0.85, duration: 0.18 },
+              { attr: { d: d2 }, duration: 0.4 },
+              { attr: { d: d3 }, duration: 0.4 },
+              { attr: { d: d1 }, duration: 0.4 },
             ],
-            stagger: { each: 0.02, from: 'random' },
             repeat: -1,
             yoyo: true,
             ease: 'sine.inOut',
           })
-
-          const ring = phoneRef.current.querySelector('.ml-spectrum-ring')
-          const ringSpin = ring ? gsap.to(ring, { rotate: 360, duration: 18, repeat: -1, ease: 'none' }) : null
-
-          cleanupFns.push(() => {
-            spectrumTween.kill()
-            ringSpin?.kill()
-          })
+          cleanupFns.push(() => waveTween.kill())
         }
 
-        if (mock && chatViewport && chatList && chatBubbles.length) {
-          gsap.set(chatBubbles, { opacity: 0, y: 16 })
-
-          const phoneTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: phoneRef.current,
-              start: 'top top',
-              end: '+=1800',
-              scrub: true,
-              pin: mock,
-              pinSpacing: true,
-              markers: false,
-            },
-          })
-
-          const shift = Math.max(0, (chatList as HTMLElement).scrollHeight - (chatViewport as HTMLElement).clientHeight)
-          phoneTl.to(chatList, { y: -shift, ease: 'none', duration: 1 }, 0)
-
-          chatBubbles.forEach((bubble, i) => {
-            phoneTl.to(bubble, { opacity: 1, y: 0, ease: 'none', duration: 0.15 }, i * 0.14)
-          })
-
-          cleanupFns.push(() => {
-            phoneTl.scrollTrigger?.kill()
-            phoneTl.kill()
-          })
+        if (phoneWaveDash) {
+          const dashTween = gsap.to(phoneWaveDash, { attr: { strokeDashoffset: -600 }, duration: 1.4, repeat: -1, ease: 'none' })
+          cleanupFns.push(() => dashTween.kill())
         }
       }
 
@@ -722,7 +691,7 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-black/20" />
               <div className="relative aspect-[3/5] rounded-2xl overflow-hidden bg-[#05060B] border border-white/10">
                 <Image
-                  src="/assets/exhibits/live-call-mona.png"
+                  src="/assets/ui/phone-screen.png"
                   alt="Visitor experience preview"
                   fill
                   sizes="(max-width: 768px) 90vw, 420px"
@@ -730,6 +699,51 @@ export default function LandingPage() {
                   priority={false}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-black/30 pointer-events-none" />
+
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[78%] pointer-events-none">
+                  <div className="ml-phone-wave relative rounded-2xl bg-black/35 border border-white/10 backdrop-blur-md px-4 py-4 shadow-[0_0_40px_rgba(0,245,255,0.18)]">
+                    <svg viewBox="0 0 330 96" className="w-full h-12 opacity-95">
+                      <defs>
+                        <linearGradient id="mlPhoneWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="var(--electric-cyan)" />
+                          <stop offset="100%" stopColor="var(--royal-violet)" />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        className="ml-phone-wave-path"
+                        d="M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48"
+                        fill="none"
+                        stroke="url(#mlPhoneWaveGrad)"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                        opacity="0.14"
+                      />
+                      <path
+                        className="ml-phone-wave-path"
+                        d="M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48"
+                        fill="none"
+                        stroke="url(#mlPhoneWaveGrad)"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        style={{ filter: 'drop-shadow(0 0 10px rgba(0,245,255,0.35))' }}
+                      />
+                      <path
+                        className="ml-phone-wave-path ml-phone-wave-dash"
+                        d="M0,48 C22,28 44,68 66,48 C88,28 110,68 132,48 C154,28 176,68 198,48 C220,28 242,68 264,48 C286,28 308,68 330,48"
+                        fill="none"
+                        stroke="url(#mlPhoneWaveGrad)"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeDasharray="18 18"
+                        strokeDashoffset="0"
+                        opacity="0.9"
+                      />
+                    </svg>
+                    <div className="mt-2 text-[10px] uppercase tracking-[0.28em] text-white/60 text-center">
+                      Live audio
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-gradient-to-br from-[var(--electric-cyan)]/30 to-[var(--royal-violet)]/20 rounded-full blur-2xl" />
             </div>
