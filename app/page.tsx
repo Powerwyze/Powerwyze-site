@@ -693,9 +693,7 @@ export default function LandingPage() {
                         <span className="ml-ripple-dot" />
                       </div>
                     </div>
-                    <div className="mt-2 text-[10px] uppercase tracking-[0.28em] text-white/60 text-center">
-                      Acoustic audio
-                    </div>
+                    <div className="mt-2 text-[10px] uppercase tracking-[0.28em] text-white/60 text-center">&nbsp;</div>
                   </div>
                 </div>
               </div>
