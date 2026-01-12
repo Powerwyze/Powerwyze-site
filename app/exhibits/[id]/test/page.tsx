@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge'
 import { supabase } from '@/lib/supabase'
 import { ElevenLabsConversation } from '@/components/elevenlabs-conversation'
 import { VapiTest } from '@/components/vapi-test'
+import RenderLanding from '@/components/landing/RenderLanding'
+import { LandingSpec } from '@/types/LandingSpec'
 
 type LogEntry = {
   timestamp: string
@@ -77,7 +79,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
     try {
       const { data, error } = await supabase
         .from('agents')
-        .select('*, venues(display_name), organizations(name)')
+        .select('*, venues(display_name, background_image_url), organizations(name)')
         .eq('id', params.id)
         .single()
 
@@ -323,6 +325,46 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-8">
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Landing Page Preview (first) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Phone className="h-5 w-5" />
+              Visitor Landing Preview
+            </CardTitle>
+            <CardDescription>
+              This is what visitors see after scanning the QR (before starting the voice session).
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full max-w-md mx-auto rounded-2xl overflow-hidden border border-border bg-black">
+              <div className="h-[680px]">
+                <RenderLanding
+                  spec={
+                    (agent.landing_spec as LandingSpec) ?? {
+                      version: 1,
+                      title: agent.name,
+                      subtitle: agent.bio || `Welcome! I'm here to help you.`,
+                      blocks: [
+                        {
+                          id: 'default-bio',
+                          type: 'paragraph',
+                          text: agent.bio || 'Tap below to start your guided conversation.',
+                        },
+                      ],
+                    }
+                  }
+                  agentName={agent.name}
+                  onTalkClick={() => setTestMode((prev) => prev ?? 'elevenlabs')}
+                  onScanAnotherClick={() => router.push('/')}
+                  isPreview={true}
+                  backgroundImage={agent.venue?.background_image_url}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
