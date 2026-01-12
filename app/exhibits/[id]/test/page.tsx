@@ -28,7 +28,9 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
   // Agent/Exhibit data
   const [agent, setAgent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [testMode, setTestMode] = useState<'vapi' | 'elevenlabs' | null>(urlMode)
+  const agentId = agent?.id ?? params.id
 
   // State
   const [isPlaying, setIsPlaying] = useState(false)
@@ -75,17 +77,30 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
 
   const loadExhibit = async () => {
     addLog('info', 'Loading exhibit data...', { exhibitId: params.id })
+    setLoadError(null)
 
     try {
-      const { data, error } = await supabase
+      const select = '*, venues(display_name, background_image_url), organizations(name)'
+
+      // First try by internal UUID id, then fall back to slug (helps if links use slug)
+      let { data, error } = await supabase
         .from('agents')
-        .select('*, venues(display_name, background_image_url), organizations(name)')
+        .select(select)
         .eq('id', params.id)
         .single()
 
       if (error) {
+        ;({ data, error } = await supabase
+          .from('agents')
+          .select(select)
+          .eq('slug', params.id)
+          .single())
+      }
+
+      if (error) {
         addLog('error', 'Failed to load exhibit', error.message)
         setApiStatus(prev => ({ ...prev, database: 'error' }))
+        setLoadError(error.message)
         setLoading(false)
         return
       }
@@ -103,7 +118,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
           const { data: capabilities } = await supabase
             .from('agent_capabilities')
             .select('*')
-            .eq('agent_id', params.id)
+            .eq('agent_id', data.id)
             .single()
 
           if (capabilities) {
@@ -135,6 +150,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
     } catch (error: any) {
       addLog('error', 'Database connection failed', error.message)
       setApiStatus(prev => ({ ...prev, database: 'error' }))
+      setLoadError(error.message)
     }
 
     setLoading(false)
@@ -310,7 +326,9 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
         <div className="max-w-6xl mx-auto">
           <Card>
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">Exhibit not found</p>
+              <p className="text-center text-muted-foreground">
+                {loadError ? `Failed to load exhibit: ${loadError}` : 'Exhibit not found'}
+              </p>
               <Button onClick={() => router.push('/exhibits')} className="mt-4 mx-auto block">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Exhibits
@@ -369,7 +387,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={() => router.push(`/exhibits/${params.id}`)}>
+              <Button variant="ghost" size="sm" onClick={() => router.push(`/exhibits/${agentId}`)}>
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
@@ -630,7 +648,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
                               const res = await fetch('/api/agents/sync-elevenlabs', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ agentId: params.id })
+                                body: JSON.stringify({ agentId })
                               })
                               const data = await res.json()
                               if (data.success) {
@@ -656,7 +674,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
                               const res = await fetch('/api/agents/recreate-elevenlabs', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ agentId: params.id })
+                                body: JSON.stringify({ agentId })
                               })
                               const data = await res.json()
                               if (data.success) {
@@ -696,7 +714,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
                             const res = await fetch('/api/agents/sync-elevenlabs', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ agentId: params.id })
+                              body: JSON.stringify({ agentId })
                             })
                             const data = await res.json()
                             if (data.success) {
@@ -761,7 +779,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
                             const res = await fetch('/api/agents/sync-vapi', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ agentId: params.id })
+                              body: JSON.stringify({ agentId })
                             })
                             const data = await res.json()
                             if (data.success) {
