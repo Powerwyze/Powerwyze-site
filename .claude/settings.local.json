@@ -11,7 +11,12 @@
       "Bash(mkdir:*)",
       "Bash(supabase db:*)",
       "Bash(echo $env:ELEVENLABS_API_KEY)",
-      "Bash(Get-ChildItem Env:ELEVENLABS_API_KEY)"
+      "Bash(Get-ChildItem Env:ELEVENLABS_API_KEY)",
+      "Bash(npx supabase:*)",
+      "Bash(git diff:*)",
+      "Bash(git show:*)",
+      "Bash(cat:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

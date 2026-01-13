@@ -9,20 +9,97 @@ type ConversationProps = {
   agentId: string
   onError?: (error: string) => void
   onStatusChange?: (status: 'idle' | 'connecting' | 'connected' | 'disconnected') => void
+  onAudioLevel?: (level: number) => void
+  onMuteChange?: (isMuted: boolean) => void
+  autoStart?: boolean
 }
 
-export function ElevenLabsConversation({ agentId, onError, onStatusChange }: ConversationProps) {
+export function ElevenLabsConversation({ agentId, onError, onStatusChange, onAudioLevel, onMuteChange, autoStart = false }: ConversationProps) {
   const [transcript, setTranscript] = useState<string[]>([])
-  const [isMuted, setIsMuted] = useState(false)
+  const [isMuted, setIsMuted] = useState(true) // Start muted by default
   const [status, setStatus] = useState<'idle' | 'connecting' | 'connected' | 'disconnected'>('idle')
   const [isSpeaking, setIsSpeaking] = useState(false)
   const conversationRef = useRef<any>(null)
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const analyserRef = useRef<AnalyserNode | null>(null)
+  const animationFrameRef = useRef<number>()
+
+  // Auto-start if requested
+  const hasAutoStartedRef = useRef(false)
+
+  useEffect(() => {
+    if (autoStart && status === 'idle' && !hasAutoStartedRef.current) {
+      console.log('Auto-starting conversation...')
+      hasAutoStartedRef.current = true
+      startConversation()
+    }
+  }, [autoStart, status])
+
+  // Audio analysis loop
+  const analyzeAudio = useCallback(() => {
+    if (!analyserRef.current || status !== 'connected') {
+      return
+    }
+
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount)
+    analyserRef.current.getByteFrequencyData(dataArray)
+
+    // Calculate average audio level (0-1)
+    const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length / 255
+
+    onAudioLevel?.(average)
+
+    animationFrameRef.current = requestAnimationFrame(analyzeAudio)
+  }, [status, onAudioLevel])
+
+  // Start audio analysis when connected
+  useEffect(() => {
+    if (status === 'connected' && !analyserRef.current) {
+      try {
+        // Create audio context and analyser
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        const analyser = audioContext.createAnalyser()
+        analyser.fftSize = 256
+        analyser.smoothingTimeConstant = 0.8
+
+        audioContextRef.current = audioContext
+        analyserRef.current = analyser
+
+        // Connect to audio destination (speaker output)
+        const destination = audioContext.createMediaStreamDestination()
+        analyser.connect(audioContext.destination)
+
+        console.log('Audio analysis started')
+        analyzeAudio()
+      } catch (error) {
+        console.error('Failed to setup audio analysis:', error)
+      }
+    } else if (status === 'disconnected' && animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      analyserRef.current = null
+      audioContextRef.current?.close()
+      audioContextRef.current = null
+      onAudioLevel?.(0)
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [status, analyzeAudio])
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
       if (conversationRef.current) {
         conversationRef.current.endSession().catch(() => {})
+      }
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close()
       }
     }
   }, [])
@@ -51,6 +128,12 @@ export function ElevenLabsConversation({ agentId, onError, onStatusChange }: Con
           console.log('✓ ElevenLabs SDK: Connected!')
           setStatus('connected')
           onStatusChange?.('connected')
+          // Start muted by default
+          if (conversationRef.current) {
+            conversationRef.current.setInputMuted?.(true)
+          }
+          setIsMuted(true)
+          onMuteChange?.(true)
         },
         onDisconnect: () => {
           console.log('✓ ElevenLabs SDK: Disconnected')
@@ -104,14 +187,23 @@ export function ElevenLabsConversation({ agentId, onError, onStatusChange }: Con
 
   const toggleMute = useCallback(() => {
     if (conversationRef.current) {
-      if (isMuted) {
-        conversationRef.current.setVolume?.({ volume: 1 })
-      } else {
-        conversationRef.current.setVolume?.({ volume: 0 })
-      }
-      setIsMuted(!isMuted)
+      const newMutedState = !isMuted
+      conversationRef.current.setInputMuted?.(newMutedState)
+      setIsMuted(newMutedState)
+      onMuteChange?.(newMutedState)
+      console.log(`Microphone ${newMutedState ? 'muted' : 'unmuted'}`)
     }
-  }, [isMuted])
+  }, [isMuted, onMuteChange])
+
+  // Expose toggleMute function
+  useEffect(() => {
+    if (onMuteChange) {
+      (window as any).__elevenLabsToggleMute = toggleMute
+    }
+    return () => {
+      delete (window as any).__elevenLabsToggleMute
+    }
+  }, [toggleMute, onMuteChange])
 
   const isConnected = status === 'connected'
   const isConnecting = status === 'connecting'

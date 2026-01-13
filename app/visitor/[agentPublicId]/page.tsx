@@ -260,32 +260,28 @@ export default function VisitorPage() {
 
   // After payment or no paywall: Show landing page or default UI
   // If agent has a custom landing_spec, render it
-  if (agent.landing_spec && !talkActive) {
+  if (agent.landing_spec) {
     return (
       <>
         <RenderLanding
           spec={agent.landing_spec}
           agentName={agent.name}
+          organizationName={agent.organization?.name}
+          venueName={agent.venue?.display_name}
           onTalkClick={handleStartTalk}
           onScanAnotherClick={handleScanAnother}
           backgroundImage={agent.venue?.background_image_url}
+          isConversationActive={talkActive}
         />
 
-        {/* Talk Widget Overlay */}
+        {/* Hidden audio component for conversation */}
         {talkActive && sessionConfig && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md border-green-200 bg-green-50">
-              <CardHeader>
-                <CardTitle className="text-lg">Conversation Active</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {sessionConfig.provider === 'elevenlabs' ? (
-                  <ElevenLabsVisitor config={sessionConfig} onEnd={handleEndTalk} />
-                ) : (
-                  <VapiVisitor config={sessionConfig} onEnd={handleEndTalk} />
-                )}
-              </CardContent>
-            </Card>
+          <div className="hidden">
+            {sessionConfig.provider === 'elevenlabs' ? (
+              <ElevenLabsVisitor config={sessionConfig} onEnd={handleEndTalk} />
+            ) : (
+              <VapiVisitor config={sessionConfig} onEnd={handleEndTalk} />
+            )}
           </div>
         )}
       </>
@@ -316,26 +312,22 @@ export default function VisitorPage() {
       <RenderLanding
         spec={defaultSpec}
         agentName={agent.name}
+        organizationName={agent.organization?.name}
+        venueName={agent.venue?.display_name}
         onTalkClick={handleStartTalk}
         onScanAnotherClick={handleScanAnother}
         backgroundImage={agent.venue?.background_image_url}
+        isConversationActive={talkActive}
       />
 
-      {/* Talk Widget Overlay */}
+      {/* Hidden audio component for conversation */}
       {talkActive && sessionConfig && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md border-green-200 bg-green-50">
-            <CardHeader>
-              <CardTitle className="text-lg">Conversation Active</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {sessionConfig.provider === 'elevenlabs' ? (
-                <ElevenLabsVisitor config={sessionConfig} onEnd={handleEndTalk} />
-              ) : (
-                <VapiVisitor config={sessionConfig} onEnd={handleEndTalk} />
-              )}
-            </CardContent>
-          </Card>
+        <div className="hidden">
+          {sessionConfig.provider === 'elevenlabs' ? (
+            <ElevenLabsVisitor config={sessionConfig} onEnd={handleEndTalk} />
+          ) : (
+            <VapiVisitor config={sessionConfig} onEnd={handleEndTalk} />
+          )}
         </div>
       )}
     </>

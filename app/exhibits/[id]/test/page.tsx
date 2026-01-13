@@ -41,6 +41,10 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
     database: 'unknown'
   })
   const [testText, setTestText] = useState('Hello! This is a test of the voice synthesis system.')
+  const [previewConversationActive, setPreviewConversationActive] = useState(false)
+  const [previewConversationStarting, setPreviewConversationStarting] = useState(false)
+  const [audioLevel, setAudioLevel] = useState(0)
+  const [isMicMuted, setIsMicMuted] = useState(true)
 
   // Refs
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -80,7 +84,7 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
     setLoadError(null)
 
     try {
-      const select = '*, venues(display_name, background_image_url), organizations(name)'
+      const select = '*, venues(display_name), organizations(name)'
 
       // First try by internal UUID id, then fall back to slug (helps if links use slug)
       let { data, error } = await supabase
@@ -349,14 +353,20 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
             <CardTitle className="flex items-center gap-2">
               <Phone className="h-5 w-5" />
               Visitor Landing Preview
+              {previewConversationActive && (
+                <Badge className="bg-green-500">Active</Badge>
+              )}
             </CardTitle>
             <CardDescription>
-              This is what visitors see after scanning the QR (before starting the voice session).
+              {previewConversationActive
+                ? 'Conversation active - the 3D ball is animating! Click "End Conversation" to stop.'
+                : 'Click "Talk" in the preview to test the conversation with live 3D ball animation.'}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="w-full max-w-md mx-auto rounded-2xl overflow-hidden border border-border bg-black">
-              <div className="h-[680px]">
+          <CardContent className="space-y-4">
+            {/* Preview container */}
+            <div className="w-full max-w-md mx-auto rounded-2xl overflow-hidden border border-border bg-black relative">
+              <div className="h-[680px] relative" style={{ pointerEvents: 'auto' }}>
                 <RenderLanding
                   spec={
                     (agent.landing_spec as LandingSpec) ?? {
@@ -373,11 +383,98 @@ function ExhibitTestPageContent({ params }: { params: { id: string } }) {
                     }
                   }
                   agentName={agent.name}
-                  onTalkClick={() => setTestMode((prev) => prev ?? 'elevenlabs')}
-                  onScanAnotherClick={() => router.push('/')}
+                  organizationName={agent.organizations?.name}
+                  venueName={agent.venues?.display_name}
+                  onTalkClick={() => {
+                    console.log('Talk button clicked in preview!')
+
+                    // Check if agent is synced
+                    const platform = agent?.voice_platform ?? 'elevenlabs'
+                    const isSynced = platform === 'elevenlabs' ? agent?.elevenlabs_agent_id : agent?.vapi_assistant_id
+
+                    if (!isSynced) {
+                      addLog('error', '⚠️ Agent not synced! Please sync the agent first before testing conversation.')
+                      alert('This agent needs to be synced to ' + (platform === 'elevenlabs' ? 'ElevenLabs' : 'Vapi') + ' first. Scroll down and click "Sync to ElevenLabs" or publish the agent.')
+                      return
+                    }
+
+                    console.log('Starting conversation with synced agent:', { platform, agentId: isSynced })
+                    setTestMode(platform)
+                    setPreviewConversationStarting(true)
+                    addLog('info', '🎙️ Connecting to voice agent...')
+                  }}
+                  onScanAnotherClick={() => {
+                    console.log('Scan another clicked in preview!')
+                    setPreviewConversationActive(false)
+                    setPreviewConversationStarting(false)
+                    addLog('info', 'Preview conversation ended')
+                  }}
                   isPreview={true}
-                  backgroundImage={agent.venue?.background_image_url}
+                  isConversationActive={previewConversationActive}
+                  audioLevel={audioLevel}
+                  isMicMuted={isMicMuted}
+                  onToggleMute={() => {
+                    if ((window as any).__elevenLabsToggleMute) {
+                      (window as any).__elevenLabsToggleMute()
+                    }
+                  }}
                 />
+
+                {/* Conversation component */}
+                {(previewConversationStarting || previewConversationActive) && (
+                  <>
+                    {/* Hidden conversation component for audio */}
+                    {((testMode === 'elevenlabs' && agent?.elevenlabs_agent_id) ||
+                      (testMode === 'vapi' && agent?.vapi_assistant_id)) && (
+                      <div className="hidden">
+                        {testMode === 'elevenlabs' && agent?.elevenlabs_agent_id ? (
+                          <ElevenLabsConversation
+                            agentId={agent.elevenlabs_agent_id}
+                            autoStart={true}
+                            onError={(error) => {
+                              addLog('error', '❌ Preview conversation error: ' + error)
+                              alert('Failed to connect to ElevenLabs: ' + error + '\n\nMake sure:\n1. Agent is synced to ElevenLabs\n2. ElevenLabs API key is configured\n3. Microphone permission is granted')
+                              setPreviewConversationActive(false)
+                              setPreviewConversationStarting(false)
+                              setAudioLevel(0)
+                            }}
+                            onStatusChange={(status) => {
+                              addLog('info', `Preview conversation status: ${status}`)
+                              if (status === 'connected') {
+                                setPreviewConversationActive(true)
+                                setPreviewConversationStarting(false)
+                                addLog('success', '✅ Voice agent connected! 3D ball now reacting to audio.')
+                              } else if (status === 'disconnected') {
+                                setPreviewConversationActive(false)
+                                setPreviewConversationStarting(false)
+                                setAudioLevel(0)
+                              }
+                            }}
+                            onAudioLevel={(level) => {
+                              setAudioLevel(level)
+                            }}
+                            onMuteChange={(muted) => {
+                              setIsMicMuted(muted)
+                              addLog('info', `Microphone ${muted ? '🔇 muted' : '🎤 unmuted'}`)
+                            }}
+                          />
+                        ) : testMode === 'vapi' && agent?.vapi_assistant_id ? (
+                          <VapiTest
+                            agentConfig={{
+                              name: agent.name,
+                              systemPrompt: agent.persona,
+                              personality: agent.persona,
+                              voice: agent.voice || '21m00Tcm4TlvDq8ikWAM',
+                              firstMessage: `Hello! I'm ${agent.name}. How can I help you today?`
+                            }}
+                            tier={agent.tier || 1}
+                            vapiAssistantId={agent.vapi_assistant_id}
+                          />
+                        ) : null}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </CardContent>

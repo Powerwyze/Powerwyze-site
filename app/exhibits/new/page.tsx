@@ -26,6 +26,7 @@ function NewExhibitForm() {
   const [publishing, setPublishing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [organizationId, setOrganizationId] = useState<string | null>(null)
+  const [organizationName, setOrganizationName] = useState<string>('')
   const [venues, setVenues] = useState<any[]>([])
   const [qrPreview, setQrPreview] = useState<string | null>(null)
   const [agentId, setAgentId] = useState<string | null>(null)
@@ -79,6 +80,7 @@ function NewExhibitForm() {
   const [landingBackgroundPrompt, setLandingBackgroundPrompt] = useState('')
   const [uploadingLandingBackground, setUploadingLandingBackground] = useState(false)
   const [generatingLandingBackground, setGeneratingLandingBackground] = useState(false)
+  const [savingLandingFromPreview, setSavingLandingFromPreview] = useState(false)
 
   // Load data on mount
   useEffect(() => {
@@ -107,7 +109,7 @@ function NewExhibitForm() {
 
         const { data: org } = await supabase
           .from('organizations')
-          .select('id')
+          .select('id, name')
           .eq('owner_user_id', user.id)
           .single()
 
@@ -117,6 +119,7 @@ function NewExhibitForm() {
         }
 
         setOrganizationId(org.id)
+        setOrganizationName(org.name || '')
 
         // Load venues
         const { data: venuesData } = await supabase
@@ -238,6 +241,31 @@ function NewExhibitForm() {
     setSaving(true)
 
     try {
+      // Build landing spec with current background settings
+      // Create a minimal landing spec if one doesn't exist but background mode is set
+      const currentLandingSpec = landingSpec ? {
+        ...landingSpec,
+        background: {
+          mode: landingBackgroundMode,
+          imageUrl:
+            landingBackgroundMode === 'upload' || landingBackgroundMode === 'ai'
+              ? (landingBackgroundImageUrl || undefined)
+              : undefined,
+        },
+      } : (landingBackgroundMode !== 'venue' || landingBackgroundImageUrl) ? {
+        version: 1,
+        title: name.trim() || 'Welcome',
+        subtitle: bio.trim() || 'Tap below to start a conversation',
+        blocks: [],
+        background: {
+          mode: landingBackgroundMode,
+          imageUrl:
+            landingBackgroundMode === 'upload' || landingBackgroundMode === 'ai'
+              ? (landingBackgroundImageUrl || undefined)
+              : undefined,
+        },
+      } : null
+
       const agentData = {
         organization_id: organizationId,
         venue_id: venueId || null,
@@ -255,6 +283,7 @@ function NewExhibitForm() {
         qr_shape: qrShape,
         voice_platform: voicePlatform,
         status: 'draft',
+        landing_spec: currentLandingSpec,
       }
 
       let capabilitiesData = null
@@ -293,6 +322,11 @@ function NewExhibitForm() {
 
       setAgentId(result.agent.id)
       setIsEditMode(true)
+
+      // Update landing spec state if it was saved
+      if (currentLandingSpec) {
+        setLandingSpec(currentLandingSpec)
+      }
 
       // Show success feedback
       setError(null)
@@ -431,10 +465,18 @@ function NewExhibitForm() {
   }
 
   const handleSaveLanding = async () => {
-    if (!agentId || !landingSpec) {
-      setError('Please generate a landing page first')
+    if (!agentId) {
+      setError('Please save the agent first before saving landing page')
       return
     }
+
+    if (!landingSpec) {
+      setError('No landing page to save')
+      return
+    }
+
+    setSavingLandingFromPreview(true)
+    setError(null)
 
     try {
       const specToSave: LandingSpec = {
@@ -448,21 +490,35 @@ function NewExhibitForm() {
         },
       }
 
-      const { error } = await supabase
+      console.log('Saving landing spec to database:', specToSave)
+
+      const { data, error } = await supabase
         .from('agents')
         .update({
           landing_spec: specToSave,
-          landing_last_generated_at: new Date().toISOString(),
         })
         .eq('id', agentId)
+        .select()
 
-      if (error) throw error
+      if (error) {
+        console.error('Database error:', error)
+        throw error
+      }
 
+      console.log('Landing spec saved successfully:', data)
       setLandingSpec(specToSave)
       setError(null)
       setPreviewOpen(false)
+
+      // Show success feedback briefly
+      setTimeout(() => {
+        alert('Landing page saved successfully!')
+      }, 100)
     } catch (err: any) {
+      console.error('Failed to save landing page:', err)
       setError(err.message || 'Failed to save landing page')
+    } finally {
+      setSavingLandingFromPreview(false)
     }
   }
 
@@ -498,7 +554,13 @@ function NewExhibitForm() {
               ...prev,
               background: { mode: 'upload', imageUrl: json.imageUrl },
             }
-          : prev
+          : {
+              version: 1,
+              title: name || 'Welcome',
+              subtitle: bio || 'Tap below to start a conversation',
+              blocks: [],
+              background: { mode: 'upload', imageUrl: json.imageUrl },
+            }
       )
     } catch (e: any) {
       setError(e.message || 'Failed to upload background image')
@@ -539,7 +601,13 @@ function NewExhibitForm() {
               ...prev,
               background: { mode: 'ai', imageUrl: json.imageUrl },
             }
-          : prev
+          : {
+              version: 1,
+              title: name || 'Welcome',
+              subtitle: bio || 'Tap below to start a conversation',
+              blocks: [],
+              background: { mode: 'ai', imageUrl: json.imageUrl },
+            }
       )
     } catch (e: any) {
       setError(e.message || 'Failed to generate background image')
@@ -738,7 +806,13 @@ function NewExhibitForm() {
                       onClick={() => {
                         setLandingBackgroundMode('black')
                         setLandingBackgroundImageUrl('')
-                        setLandingSpec((prev) => prev ? ({ ...prev, background: { mode: 'black' } }) : prev)
+                        setLandingSpec((prev) => prev ? ({ ...prev, background: { mode: 'black' } }) : {
+                          version: 1,
+                          title: name || 'Welcome',
+                          subtitle: bio || 'Tap below to start a conversation',
+                          blocks: [],
+                          background: { mode: 'black' },
+                        })
                       }}
                     >
                       Black
@@ -748,7 +822,13 @@ function NewExhibitForm() {
                       variant={landingBackgroundMode === 'upload' ? 'default' : 'outline'}
                       onClick={() => {
                         setLandingBackgroundMode('upload')
-                        setLandingSpec((prev) => prev ? ({ ...prev, background: { mode: 'upload', imageUrl: landingBackgroundImageUrl || undefined } }) : prev)
+                        setLandingSpec((prev) => prev ? ({ ...prev, background: { mode: 'upload', imageUrl: landingBackgroundImageUrl || undefined } }) : {
+                          version: 1,
+                          title: name || 'Welcome',
+                          subtitle: bio || 'Tap below to start a conversation',
+                          blocks: [],
+                          background: { mode: 'upload', imageUrl: landingBackgroundImageUrl || undefined },
+                        })
                       }}
                     >
                       Upload
@@ -758,7 +838,13 @@ function NewExhibitForm() {
                       variant={landingBackgroundMode === 'ai' ? 'default' : 'outline'}
                       onClick={() => {
                         setLandingBackgroundMode('ai')
-                        setLandingSpec((prev) => prev ? ({ ...prev, background: { mode: 'ai', imageUrl: landingBackgroundImageUrl || undefined } }) : prev)
+                        setLandingSpec((prev) => prev ? ({ ...prev, background: { mode: 'ai', imageUrl: landingBackgroundImageUrl || undefined } }) : {
+                          version: 1,
+                          title: name || 'Welcome',
+                          subtitle: bio || 'Tap below to start a conversation',
+                          blocks: [],
+                          background: { mode: 'ai', imageUrl: landingBackgroundImageUrl || undefined },
+                        })
                       }}
                     >
                       AI
@@ -882,10 +968,14 @@ function NewExhibitForm() {
                 {landingSpec && (
                   <div className="p-3 bg-green-50 border border-green-200 rounded-md">
                     <p className="text-sm font-medium text-green-800">
-                      ✓ Landing page generated
+                      ✓ Landing page configured
                     </p>
                     <p className="text-xs text-green-600 mt-1">
-                      Last generated: {new Date().toLocaleDateString()}
+                      Background: {landingBackgroundMode === 'black' ? 'Black screen' : landingBackgroundMode === 'upload' ? 'Custom upload' : landingBackgroundMode === 'ai' ? 'AI generated' : 'Venue default'}
+                      {landingBackgroundImageUrl && ' ✓'}
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">
+                      Click the main "Save" button below to persist all changes
                     </p>
                   </div>
                 )}
@@ -1166,6 +1256,8 @@ function NewExhibitForm() {
               <RenderLanding
                 spec={landingSpec}
                 agentName={name}
+                organizationName={organizationName}
+                venueName={venues.find((v) => v.id === venueId)?.display_name}
                 onTalkClick={() => {}}
                 onScanAnotherClick={() => {}}
                 isPreview={true}
@@ -1181,13 +1273,24 @@ function NewExhibitForm() {
             <Button
               onClick={handleSaveLanding}
               className="flex-1"
+              disabled={savingLandingFromPreview}
             >
-              <Save className="h-4 w-4 mr-2" />
-              Save Landing Page
+              {savingLandingFromPreview ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Landing Page
+                </>
+              )}
             </Button>
             <Button
               onClick={() => setPreviewOpen(false)}
               variant="outline"
+              disabled={savingLandingFromPreview}
             >
               Cancel
             </Button>
