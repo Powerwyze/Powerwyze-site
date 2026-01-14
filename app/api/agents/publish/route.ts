@@ -45,18 +45,18 @@ export async function POST(request: NextRequest) {
       updateData.first_published_at = new Date().toISOString()
     }
 
-    // TODO: Re-enable ElevenLabs sync when API keys are configured
-    // For now, skip sync to allow publishing without API keys
-    // let elevenLabsAgentId = agent.elevenlabs_agent_id
-    // try {
-    //   const result = await syncAgentToElevenLabs(agent)
-    //   elevenLabsAgentId = result.agentId || agent.elevenlabs_agent_id
-    //   if (elevenLabsAgentId && elevenLabsAgentId !== agent.elevenlabs_agent_id) {
-    //     updateData.elevenlabs_agent_id = elevenLabsAgentId
-    //   }
-    // } catch (error: any) {
-    //   console.error('Failed to sync to ElevenLabs:', error)
-    // }
+    // Sync agent to ElevenLabs Conversational AI
+    let elevenLabsAgentId = agent.elevenlabs_agent_id
+    try {
+      const result = await syncAgentToElevenLabs(agent)
+      elevenLabsAgentId = result.agentId || agent.elevenlabs_agent_id
+      if (elevenLabsAgentId && elevenLabsAgentId !== agent.elevenlabs_agent_id) {
+        updateData.elevenlabs_agent_id = elevenLabsAgentId
+      }
+    } catch (error: any) {
+      console.error('Failed to sync to ElevenLabs:', error)
+      // Continue publishing even if ElevenLabs sync fails
+    }
 
     const { data: updatedAgent, error: updateError } = await supabase
       .from('agents')

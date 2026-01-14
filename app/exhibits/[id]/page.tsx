@@ -147,7 +147,7 @@ export default function ExhibitDetailPage({ params }: { params: { id: string } }
       // Successfully published - agent and landing page are now live!
       // Refetch agent to ensure we have the latest data and trigger QR regeneration
       await fetchAgent()
-      alert('Agent published successfully! Your landing page is now live and accessible to visitors.')
+      alert('Agent published successfully!\n\n✓ Landing page is now live\n✓ Synced to ElevenLabs\n✓ QR code is accessible to visitors')
     } catch (error: any) {
       console.error('Publish error:', error)
       alert(`Failed to publish: ${error.message}`)
