@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
+import { syncAgentToElevenLabs } from '@/lib/elevenlabs-sync'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -31,6 +32,26 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Agent not found' },
         { status: 404 }
       )
+    }
+
+    // Auto-sync ElevenLabs agent if missing so visitors can talk immediately
+    if (!agent.elevenlabs_agent_id) {
+      try {
+        const result = await syncAgentToElevenLabs(agent)
+        if (result.agentId && result.agentId !== agent.elevenlabs_agent_id) {
+          await supabase
+            .from('agents')
+            .update({ elevenlabs_agent_id: result.agentId })
+            .eq('id', agent.id)
+          agent.elevenlabs_agent_id = result.agentId
+        }
+      } catch (syncError: any) {
+        console.error('ElevenLabs auto-sync failed:', syncError)
+        return NextResponse.json(
+          { success: false, error: 'ElevenLabs agent not ready. Please try again in a moment.' },
+          { status: 502 }
+        )
+      }
     }
 
     // Check paywall status
