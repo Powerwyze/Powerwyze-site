@@ -228,7 +228,7 @@ export default function ExhibitDetailPage({ params }: { params: { id: string } }
                 <div>
                   <h4 className="text-sm font-medium mb-1">Personality</h4>
                   <p className="text-sm text-muted-foreground line-clamp-2">
-                    {agent.personality || 'Not set'}
+                    {agent.persona || 'Not set'}
                   </p>
                 </div>
                 <div>
