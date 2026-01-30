@@ -11,7 +11,6 @@ import { Conversation } from '@elevenlabs/client'
 export default function LandingPage() {
   const router = useRouter()
   const heroRef = useRef<HTMLDivElement>(null)
-  const sphereRef = useRef<HTMLDivElement>(null)
   const headlineRef = useRef<HTMLHeadingElement>(null)
   const scannerRef = useRef<HTMLDivElement>(null)
   const phoneRef = useRef<HTMLDivElement>(null)
@@ -147,9 +146,6 @@ export default function LandingPage() {
   useEffect(() => {
     if (!isLoaded || !isGsapReady) return
 
-    let heroWaveTween: gsap.core.Tween | null = null
-    let heroWaveDashTween: gsap.core.Tween | null = null
-
     // Hero Entrance Animation - Character by character reveal
     if (headlineRef.current) {
       // Use textContent to get decoded text (not innerHTML which has &amp; etc)
@@ -182,27 +178,6 @@ export default function LandingPage() {
       })
     }
 
-    // Voice Sphere magnetic follow
-    const handleMouseMove = (e: MouseEvent) => {
-      if (sphereRef.current) {
-        const rect = sphereRef.current.getBoundingClientRect()
-        const centerX = rect.left + rect.width / 2
-        const centerY = rect.top + rect.height / 2
-
-        const deltaX = (e.clientX - centerX) * 0.1
-        const deltaY = (e.clientY - centerY) * 0.1
-
-        gsap.to(sphereRef.current, {
-          x: deltaX,
-          y: deltaY,
-          duration: 1.5,
-          ease: 'power2.out'
-        })
-      }
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-
     // Background particles
     const createParticles = () => {
       if (!heroRef.current) return
@@ -227,34 +202,7 @@ export default function LandingPage() {
 
     createParticles()
 
-    const heroWavePaths = sphereRef.current?.querySelectorAll('.hero-wave-path')
-    const heroWaveDash = sphereRef.current?.querySelector('.hero-wave-dash')
-
-    if (heroWavePaths?.length) {
-      const d1 = 'M0,60 C40,20 80,100 120,60 C160,20 200,100 240,60 C280,20 320,100 360,60'
-      const d2 = 'M0,60 C40,35 80,85 120,60 C160,10 200,110 240,60 C280,28 320,92 360,60'
-      const d3 = 'M0,60 C40,10 80,110 120,60 C160,40 200,80 240,60 C280,12 320,108 360,60'
-
-      heroWaveTween = gsap.to(heroWavePaths, {
-        keyframes: [
-          { attr: { d: d2 }, duration: 0.35 },
-          { attr: { d: d3 }, duration: 0.35 },
-          { attr: { d: d1 }, duration: 0.35 },
-        ],
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      })
-    }
-
-    if (heroWaveDash) {
-      heroWaveDashTween = gsap.to(heroWaveDash, { attr: { strokeDashoffset: -720 }, duration: 1.6, repeat: -1, ease: 'none' })
-    }
-
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      heroWaveTween?.kill()
-      heroWaveDashTween?.kill()
     }
   }, [isLoaded, isGsapReady])
 
@@ -463,11 +411,11 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'url(/assets/backgrounds/neural-grid.png)', backgroundSize: 'cover', mixBlendMode: 'screen' }} />
 
         {/* Main content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
           <div className="text-left">
             <div className="inline-flex items-center gap-2 glass-card mb-6 px-4 py-2 bg-white/10 border border-white/20">
               <span className="w-2 h-2 bg-[var(--electric-cyan)] rounded-full animate-pulse" />
-              <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)] font-semibold">Give your exhibits</span>
+              <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)] font-semibold">Give your exhibits a voice</span>
             </div>
 
             <h1
@@ -493,84 +441,15 @@ export default function LandingPage() {
                 <span>See the Demo</span>
               </button>
             </div>
-          </div>
-
-          <div className="relative">
-            <div
-              ref={sphereRef}
-              className="hero-card relative glass-card bg-white/10 border border-white/20 rounded-3xl p-6 overflow-hidden"
-              style={{ boxShadow: '0 30px 80px rgba(0,0,0,0.4)', willChange: 'transform' }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-[rgba(0,245,255,0.08)] via-[rgba(138,43,226,0.05)] to-transparent pointer-events-none" />
-              <div className="relative aspect-square w-full max-w-[420px] mx-auto">
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="relative w-[92%] h-[92%] rounded-full">
-                    <div className="absolute inset-[-10%] rounded-full bg-[conic-gradient(from_90deg,rgba(0,245,255,0.0),rgba(0,245,255,0.25),rgba(138,43,226,0.25),rgba(0,245,255,0.0))] blur-2xl opacity-60 animate-[spin_18s_linear_infinite]" />
-                    <div className="absolute inset-0 rounded-full border border-white/10 bg-white/5 overflow-hidden shadow-[0_0_60px_rgba(0,245,255,0.18)]">
-                      <div
-                        className="absolute inset-0 opacity-95"
-                        style={{
-                          background:
-                            'radial-gradient(circle at 28% 28%, rgba(0,245,255,0.35), transparent 55%), radial-gradient(circle at 72% 68%, rgba(138,43,226,0.26), transparent 58%), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.10), transparent 60%)',
-                        }}
-                      />
-                      <div className="absolute inset-0 opacity-50 mix-blend-screen bg-[radial-gradient(circle_at_50%_50%,rgba(0,245,255,0.15),transparent_55%)] animate-[sphereBreath_5.5s_ease-in-out_infinite]" />
-                      <div className="absolute inset-0 opacity-30 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.18),transparent)] animate-[sheen_6s_ease-in-out_infinite]" />
-                    </div>
-
-                    <div className="absolute inset-0 grid place-items-center pointer-events-none">
-                      <svg viewBox="0 0 360 120" className="w-[92%] h-[44%] opacity-95">
-                        <defs>
-                          <linearGradient id="heroWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="var(--electric-cyan)" />
-                            <stop offset="100%" stopColor="var(--royal-violet)" />
-                          </linearGradient>
-                        </defs>
-                        <path
-                          className="hero-wave-path"
-                          d="M0,60 C40,20 80,100 120,60 C160,20 200,100 240,60 C280,20 320,100 360,60"
-                          fill="none"
-                          stroke="url(#heroWaveGrad)"
-                          strokeWidth="10"
-                          strokeLinecap="round"
-                          opacity="0.12"
-                        />
-                        <path
-                          className="hero-wave-path"
-                          d="M0,60 C40,20 80,100 120,60 C160,20 200,100 240,60 C280,20 320,100 360,60"
-                          fill="none"
-                          stroke="url(#heroWaveGrad)"
-                          strokeWidth="4"
-                          strokeLinecap="round"
-                          style={{ filter: 'drop-shadow(0 0 12px rgba(0,245,255,0.35))' }}
-                        />
-                        <path
-                          className="hero-wave-path hero-wave-dash"
-                          d="M0,60 C40,20 80,100 120,60 C160,20 200,100 240,60 C280,20 320,100 360,60"
-                          fill="none"
-                          stroke="url(#heroWaveGrad)"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                          strokeDasharray="18 18"
-                          strokeDashoffset="0"
-                          opacity="0.8"
-                        />
-                      </svg>
-                    </div>
-
-                    <div className="absolute inset-[18%] rounded-full border border-white/10 bg-black/30 backdrop-blur-sm" />
-                  </div>
+            <div className="mt-6 flex justify-start">
+              <div className="animate-bounce">
+                <div className="w-6 h-10 rounded-full border-2 border-[var(--electric-cyan)] border-opacity-70 flex items-start justify-center p-2 bg-white/50">
+                  <div className="w-1 h-3 bg-[var(--electric-cyan)] rounded-full" />
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce z-10">
-          <div className="w-6 h-10 rounded-full border-2 border-[var(--electric-cyan)] border-opacity-70 flex items-start justify-center p-2 bg-white/50">
-            <div className="w-1 h-3 bg-[var(--electric-cyan)] rounded-full" />
-          </div>
         </div>
       </section>
 
