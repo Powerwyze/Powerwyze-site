@@ -829,7 +829,6 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-gradient-to-br from-[var(--electric-cyan)]/30 to-[var(--royal-violet)]/20 rounded-full blur-2xl" />
             </div>
           </div>
         </div>
