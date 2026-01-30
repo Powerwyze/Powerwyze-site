@@ -474,8 +474,7 @@ export default function LandingPage() {
               style={{ willChange: 'transform' }}
             >
               <span className="block sm:inline">AI Tour Guides</span>
-              <span className="block sm:inline">for Museums</span>
-              <span className="block sm:inline">&amp; Events</span>
+              <span className="block sm:inline">and Event Host</span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/80 font-medium mb-8 max-w-2xl">
