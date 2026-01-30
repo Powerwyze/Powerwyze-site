@@ -411,7 +411,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'url(/assets/backgrounds/neural-grid.png)', backgroundSize: 'cover', mixBlendMode: 'screen' }} />
 
         {/* Main content */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4">
+        <div className="relative z-10 max-w-6xl mx-auto px-4">
           <div className="text-center">
             <div className="inline-flex items-center gap-2 glass-card mb-6 px-4 py-2 bg-white/10 border border-white/20 mx-auto">
               <span className="w-2 h-2 bg-[var(--electric-cyan)] rounded-full animate-pulse" />
@@ -420,12 +420,10 @@ export default function LandingPage() {
 
             <h1
               ref={headlineRef}
-              className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-[1.15] sm:leading-[1.12] md:leading-[1.08] tracking-[0.02em] text-white drop-shadow-[0_10px_30px_rgba(0,245,255,0.15)]"
+              className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-[1.15] sm:leading-[1.12] md:leading-[1.08] tracking-[0.02em] text-white drop-shadow-[0_10px_30px_rgba(0,245,255,0.15)] whitespace-pre-line"
               style={{ willChange: 'transform' }}
             >
-              <span className="inline">AI Tour Guides </span>
-              <br />
-              <span className="inline">and Event Host</span>
+              {'AI Tour Guides'}
             </h1>
 
             <p className="text-lg md:text-xl text-white/80 font-medium mb-8 max-w-2xl mx-auto">
