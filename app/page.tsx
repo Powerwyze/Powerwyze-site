@@ -412,27 +412,27 @@ export default function LandingPage() {
 
         {/* Main content */}
         <div className="relative z-10 max-w-4xl mx-auto px-4">
-          <div className="text-left">
-            <div className="inline-flex items-center gap-2 glass-card mb-6 px-4 py-2 bg-white/10 border border-white/20">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 glass-card mb-6 px-4 py-2 bg-white/10 border border-white/20 mx-auto">
               <span className="w-2 h-2 bg-[var(--electric-cyan)] rounded-full animate-pulse" />
               <span className="text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)] font-semibold">Give your exhibits a voice</span>
             </div>
 
             <h1
               ref={headlineRef}
-              className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-[1.05] sm:leading-tight text-white drop-shadow-[0_10px_30px_rgba(0,245,255,0.15)]"
+              className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-[1.15] sm:leading-[1.12] md:leading-[1.08] tracking-[0.02em] text-white drop-shadow-[0_10px_30px_rgba(0,245,255,0.15)]"
               style={{ willChange: 'transform' }}
             >
-              <span className="inline">AI Tour Guides</span>
+              <span className="inline">AI Tour Guides </span>
               <br />
               <span className="inline">and Event Host</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-white/80 font-medium mb-8 max-w-2xl">
+            <p className="text-lg md:text-xl text-white/80 font-medium mb-8 max-w-2xl mx-auto">
               Scan, pay, and start a live conversation with every exhibit. ItTalksBack handles the voice, the paywall, and the branded landing page.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
               <button
                 type="button"
                 onClick={() => phoneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
@@ -441,7 +441,7 @@ export default function LandingPage() {
                 <span>See the Demo</span>
               </button>
             </div>
-            <div className="mt-6 flex justify-start">
+            <div className="mt-6 flex justify-center">
               <div className="animate-bounce">
                 <div className="w-6 h-10 rounded-full border-2 border-[var(--electric-cyan)] border-opacity-70 flex items-start justify-center p-2 bg-white/50">
                   <div className="w-1 h-3 bg-[var(--electric-cyan)] rounded-full" />
@@ -449,7 +449,6 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
