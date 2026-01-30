@@ -37,8 +37,8 @@ export function Header() {
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/exhibits" className="text-xl font-bold gradient-text">
-            ITtalksBack
+          <Link href="/exhibits" className="text-xl font-bold text-[#0b0f1f]">
+            ItTalksBack
           </Link>
           <nav className="flex gap-4">
             <Link href="/exhibits" className="text-sm hover:underline">

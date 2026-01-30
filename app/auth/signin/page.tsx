@@ -70,7 +70,7 @@ export default function SignInPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Admin</CardTitle>
-          <CardDescription>Welcome back to ITtalksBack</CardDescription>
+          <CardDescription>Welcome back to ItTalksBack</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignIn} className="space-y-4">

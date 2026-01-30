@@ -427,7 +427,7 @@ export default function LandingPage() {
       {/* Fixed Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass backdrop-blur-lg bg-white/70 border-b border-white/30">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold gradient-text tracking-tight">ITtalksBack</div>
+          <div className="text-2xl font-bold tracking-tight text-[#0b0f1f]">ItTalksBack</div>
           <div className="flex gap-3 items-center">
             <button
               type="button"
@@ -436,11 +436,11 @@ export default function LandingPage() {
             >
               Admin
             </button>
-            <Link href="/auth/signup">
+            <a href="https://calendly.com/spc-bstewart/voice-agent">
               <button className="btn-primary px-5 py-2 text-sm shadow-[0_0_25px_rgba(0,245,255,0.35)]">
-                Launch an Agent
+                Contact Us
               </button>
-            </Link>
+            </a>
           </div>
         </div>
       </nav>
@@ -479,7 +479,7 @@ export default function LandingPage() {
             </h1>
 
             <p className="text-lg md:text-xl text-white/80 font-medium mb-8 max-w-2xl">
-              Scan, pay, and start a live conversation with every exhibit. ITtalksBack handles the voice, the paywall, and the branded landing page.
+              Scan, pay, and start a live conversation with every exhibit. ItTalksBack handles the voice, the paywall, and the branded landing page.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -856,9 +856,9 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/10 py-12 px-4 bg-[#05060B]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-2xl font-bold gradient-text">ITtalksBack</div>
+          <div className="text-2xl font-bold text-white">ItTalksBack</div>
           <div className="text-white/60 text-sm">
-            (c) 2024 ITtalksBack. All rights reserved.
+            (c) 2024 ItTalksBack. All rights reserved.
           </div>
           <div className="flex gap-6">
             <button
@@ -868,9 +868,6 @@ export default function LandingPage() {
             >
               Admin
             </button>
-            <Link href="/exhibits" className="text-white/70 hover:text-[var(--electric-cyan)] transition-colors">
-              Dashboard
-            </Link>
           </div>
         </div>
       </footer>
