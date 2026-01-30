@@ -475,8 +475,9 @@ export default function LandingPage() {
               className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-[1.05] sm:leading-tight text-white drop-shadow-[0_10px_30px_rgba(0,245,255,0.15)]"
               style={{ willChange: 'transform' }}
             >
-              <span className="block sm:inline">AI Tour Guides </span>
-              <span className="block sm:inline">and Event Host</span>
+              <span className="inline">AI Tour Guides</span>
+              <br />
+              <span className="inline">and Event Host</span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/80 font-medium mb-8 max-w-2xl">
