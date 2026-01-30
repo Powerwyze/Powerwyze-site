@@ -473,9 +473,9 @@ export default function LandingPage() {
               className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-[1.05] sm:leading-tight text-white drop-shadow-[0_10px_30px_rgba(0,245,255,0.15)]"
               style={{ willChange: 'transform' }}
             >
-              AI Tour Guides
-              <br/>
-              for Museums & Events
+              <span className="block sm:inline">AI Tour Guides</span>
+              <span className="block sm:inline">for Museums</span>
+              <span className="block sm:inline">&amp; Events</span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/80 font-medium mb-8 max-w-2xl">
@@ -483,19 +483,13 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/auth/signup">
-                <button className="btn-primary inline-flex items-center gap-3 px-8 py-4 text-base shadow-[0_0_40px_rgba(0,245,255,0.45)]">
-                  <span>Build an Agent</span>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </button>
-              </Link>
-              <Link href="/visitor">
-                <button className="btn-glass inline-flex items-center gap-3 px-8 py-4 text-base border border-white/30 bg-white/10 text-white">
-                  <span>See the Demo</span>
-                </button>
-              </Link>
+              <button
+                type="button"
+                onClick={() => phoneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="btn-glass inline-flex items-center gap-3 px-8 py-4 text-base border border-white/30 bg-white/10 text-white"
+              >
+                <span>See the Demo</span>
+              </button>
             </div>
           </div>
 
@@ -811,20 +805,6 @@ export default function LandingPage() {
                   <div className="rounded-2xl bg-black/35 border border-white/10 backdrop-blur-md px-4 py-3 text-center shadow-[0_0_40px_rgba(0,245,255,0.14)]">
                     <div className="text-[10px] uppercase tracking-[0.34em] text-white/65">Joe&apos;s History Museum</div>
                     <div className="mt-1 text-lg font-black tracking-tight text-white">Mona Lisa</div>
-                  </div>
-                </div>
-
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[78%] pointer-events-none">
-                  <div className="ml-phone-wave relative rounded-2xl bg-black/35 border border-white/10 backdrop-blur-md px-4 py-4 shadow-[0_0_40px_rgba(0,245,255,0.18)]">
-                    <div className="relative h-12 overflow-hidden rounded-xl">
-                      <div className="ml-ripple-stack absolute inset-0">
-                        <span className="ml-ripple-ring ml-ripple-1" />
-                        <span className="ml-ripple-ring ml-ripple-2" />
-                        <span className="ml-ripple-ring ml-ripple-3" />
-                        <span className="ml-ripple-dot" />
-                      </div>
-                    </div>
-                    <div className="mt-2 text-[10px] uppercase tracking-[0.28em] text-white/60 text-center">&nbsp;</div>
                   </div>
                 </div>
 
