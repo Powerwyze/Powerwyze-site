@@ -398,7 +398,9 @@ export default function LandingPage() {
       features: [
         'Pay-as-you-go minutes',
         'Unlimited Voice Cloning',
-        'Physical exhibit buildout'
+        'Physical exhibit buildout',
+        'Unlimited custom third-party integrations',
+        'Great for one-off events'
       ],
       color: 'from-purple-500 to-pink-600'
     }
@@ -473,7 +475,7 @@ export default function LandingPage() {
               className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 leading-[1.05] sm:leading-tight text-white drop-shadow-[0_10px_30px_rgba(0,245,255,0.15)]"
               style={{ willChange: 'transform' }}
             >
-              <span className="block sm:inline">AI Tour Guides</span>
+              <span className="block sm:inline">AI Tour Guides </span>
               <span className="block sm:inline">and Event Host</span>
             </h1>
 
@@ -481,7 +483,7 @@ export default function LandingPage() {
               Scan, pay, and start a live conversation with every exhibit. ItTalksBack handles the voice, the paywall, and the branded landing page.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
               <button
                 type="button"
                 onClick={() => phoneRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
